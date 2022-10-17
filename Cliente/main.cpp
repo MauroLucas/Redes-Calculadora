@@ -9,14 +9,20 @@ public:
     SOCKET server;
     SOCKADDR_IN addr;
     char buffer[1024];
+    char ip[1024];
+    int puerto;
     Client()
     {
         cout<<"Conectando al servidor..."<<endl<<endl;
         WSAStartup(MAKEWORD(2,0), &WSAData);
         server = socket(AF_INET, SOCK_STREAM, 0);
-        addr.sin_addr.s_addr = inet_addr("192.168.1.38");
+        cout<<"Ingrese la direccion IP a la que desea conectarse"<<endl;
+        cin>>this->ip;
+        cout<<"Ingrese el puerto"<<endl;
+        cin>>this->puerto;
+        addr.sin_addr.s_addr = inet_addr(ip);
         addr.sin_family = AF_INET;
-        addr.sin_port = htons(5555);
+        addr.sin_port = htons(puerto);
         connect(server, (SOCKADDR *)&addr, sizeof(addr));
         cout << "Conectado al Servidor!" << endl;
     }
