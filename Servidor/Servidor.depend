@@ -1,0 +1,9 @@
+# depslib dependency file v1.0
+1661810728 source:c:\users\dthink\desktop\mauro\redes\servidor\main.cpp
+	<iostream>
+	<winsock2.h>
+
+1666034581 source:c:\repositorios\redes_calculadora\servidor\main.cpp
+	<iostream>
+	<winsock2.h>
+
