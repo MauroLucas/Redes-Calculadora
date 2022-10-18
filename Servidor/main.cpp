@@ -31,8 +31,18 @@ public:
 
     string Recibir()
     {
+      char opcion;
       recv(client, buffer, sizeof(buffer), 0);
       cout << "El cliente dice: " << buffer << endl;
+      opcion = buffer[0];
+      string mensaje;
+      mensaje.assign(buffer);
+      cout<<opcion<<endl;
+      switch(opcion){
+          case 'a': RealizarCalculo(mensaje);
+          break;
+          default: break;
+      }
       memset(buffer, 0, sizeof(buffer));
     }
     void Enviar()
@@ -43,6 +53,40 @@ public:
         memset(buffer, 0, sizeof(buffer));
         cout << "Mensaje enviado!" << endl;
     }
+    int convertirAEntero(string a){
+        int i = 0;
+        int num = 0;
+        while (a[i] !=0){
+            num = (a[i] - '0') + (num *10);
+            i++;
+        }
+        return num;
+    }
+    void RealizarCalculo(string calculo){
+        char operacion;
+        int i,num1,num2,posOperacion,totCaracteres=0;
+        //Tipo de Operacion
+        for(i=1;calculo[i]!='\0';i++){
+            if(calculo[i] == '+' || calculo[i] == '-' || calculo[i] == '/' || calculo[i] == '*' || calculo[i] == '!' || calculo[i] == '^'){
+               operacion = calculo[i];
+               posOperacion = i;
+            }
+        }
+        totCaracteres = i - 1 ;
+        //Primera Operador
+        num1 = convertirAEntero(calculo.substr(1,calculo.find(operacion)-1));
+        //Segundo Operador
+        num2 = convertirAEntero(calculo.substr(calculo.find(operacion) + 1,totCaracteres - 1));
+        switch(operacion){
+            case '+': cout<<"La suma es ";
+            cout<<num1+num2<<endl;
+            break;
+        }
+        cout<<num1<<endl;
+        cout<<num2<<endl;
+        cout<<operacion<<endl;
+    }
+
     void CerrarSocket()
     {
         closesocket(client);

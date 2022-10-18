@@ -28,11 +28,24 @@ public:
     }
     void Enviar()
     {
-        cout<<"Escribe el mensaje a enviar: ";
-        cin>>this->buffer;
-        send(server, buffer, sizeof(buffer), 0);
-        memset(buffer, 0, sizeof(buffer));
-        cout << "Mensaje enviado!" << endl;
+        int opcion = 0;
+        cout<<"Que desea realizar?"<<endl;
+        cout<<"1 - Realizar Calculo"<<endl;
+        cout<<"2 - Ver registro de actividades"<<endl;
+        cout<<"3 - Cerrar Sesion"<<endl;
+        cin>>opcion;
+        switch(opcion){
+            case 1: RealizarCalculo();
+            break;
+
+            case 2: VerRegistroDeActividades();
+            break;
+
+            case 3: CerrarSocket();
+            break;
+            default: break;
+        }
+
     }
     void Recibir()
     {
@@ -40,6 +53,22 @@ public:
         cout << "El servidor dice: " << buffer << endl;
         memset(buffer, 0, sizeof(buffer));
     }
+
+    void RealizarCalculo(){
+        char bufferAux[1024];
+        cout<<"Ingrese el calculo que desea realizar: ";
+        cin>>bufferAux;
+        buffer[0] = 'a';
+        for(int i=1;i<1024;i++){
+            this->buffer[i] = bufferAux[i-1];
+        }
+        send(server, buffer, sizeof(buffer), 0);
+        memset(buffer, 0, sizeof(buffer));
+        cout << "Mensaje enviado!" << endl;
+    }
+    void VerRegistroDeActividades(){
+    }
+
     void CerrarSocket()
     {
        closesocket(server);
