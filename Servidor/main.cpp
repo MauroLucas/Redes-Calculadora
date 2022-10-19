@@ -1,5 +1,7 @@
 #include <iostream>
 #include <winsock2.h>
+#include <string>
+#include <math.h>
 
 using namespace std;
 
@@ -9,6 +11,7 @@ public:
     SOCKET server, client;
     SOCKADDR_IN serverAddr, clientAddr;
     char buffer[1024];
+    char mensaje[4000];
     Server()
     {
         WSAStartup(MAKEWORD(2,0), &WSAData);
@@ -47,10 +50,8 @@ public:
     }
     void Enviar()
     {
-        cout<<"Escribe el mensaje a enviar: ";
-        cin>>this->buffer;
-        send(client, buffer, sizeof(buffer), 0);
-        memset(buffer, 0, sizeof(buffer));
+        send(client, mensaje, sizeof(mensaje), 0);
+        memset(mensaje, 0, sizeof(mensaje));
         cout << "Mensaje enviado!" << endl;
     }
     int convertirAEntero(string a){
@@ -62,8 +63,16 @@ public:
         }
         return num;
     }
+    int factorial(int x){
+        int i, resultado = 1;
+        for(i = 1; i<=x;i++){
+            resultado = resultado * i;
+        }
+        return resultado;
+    }
     void RealizarCalculo(string calculo){
         char operacion;
+        string mensajeAux = "";
         int i,num1,num2,posOperacion,totCaracteres=0;
         //Tipo de Operacion
         for(i=1;calculo[i]!='\0';i++){
@@ -78,13 +87,28 @@ public:
         //Segundo Operador
         num2 = convertirAEntero(calculo.substr(calculo.find(operacion) + 1,totCaracteres - 1));
         switch(operacion){
-            case '+': cout<<"La suma es ";
-            cout<<num1+num2<<endl;
+            case '+': mensajeAux = to_string(num1+num2);
+
+            break;
+            case '-': mensajeAux = to_string(num1-num2);
+
+            break;
+            case '*': mensajeAux = to_string(num1*num2);
+
+            break;
+            case '/': mensajeAux = to_string(num1/num2);
+
+            break;
+            case '!': mensajeAux = to_string(factorial(num1));
+
+            break;
+            case '^': mensajeAux = to_string((int)pow(num1,num2));
+
             break;
         }
-        cout<<num1<<endl;
-        cout<<num2<<endl;
-        cout<<operacion<<endl;
+        for(int i=0;i<(int)strlen(mensajeAux.c_str()) + 1;i++){
+            this->mensaje[i] = mensajeAux[i];
+        }
     }
 
     void CerrarSocket()

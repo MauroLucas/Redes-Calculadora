@@ -9,6 +9,7 @@ public:
     SOCKET server;
     SOCKADDR_IN addr;
     char buffer[1024];
+    char mensaje[4000];
     char ip[1024];
     int puerto;
     Client()
@@ -49,9 +50,9 @@ public:
     }
     void Recibir()
     {
-        recv(server, buffer, sizeof(buffer), 0);
-        cout << "El servidor dice: " << buffer << endl;
-        memset(buffer, 0, sizeof(buffer));
+        recv(server, mensaje, sizeof(mensaje), 0);
+        cout << mensaje << endl;
+        memset(mensaje, 0, sizeof(mensaje));
     }
 
     void RealizarCalculo(){
