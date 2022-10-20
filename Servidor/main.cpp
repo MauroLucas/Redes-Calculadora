@@ -70,10 +70,63 @@ public:
         }
         return resultado;
     }
+    bool validarCaracter(char c){
+        bool esValido = false;
+
+        if(c == '+' || c == '-' || c == '*' || c == '/' || c == '!' || c== '^'){
+            esValido = true;
+        }
+        if(c == '0' || c == '1' || c == '2' || c == '3' || c == '4' || c == '5' || c == '6' || c == '7' || c == '8' || c == '9'){
+            esValido = true;
+        }
+        return esValido;
+    }
+    bool validarCalculo(string mensaje){
+        bool esValido = true;
+        int cantCaracteres = 0;
+        for(int i=0; mensaje[i]!='\0';i++){
+
+            //Verifico que el caracter sea correcto
+            if(!validarCaracter(mensaje[i])){
+                esValido = false;
+            }
+
+            //Hago un conteo de los caracteres de tipo operacion
+            if(mensaje[i] == '+'){
+                cantCaracteres++;
+            }
+            if(mensaje[i] == '-'){
+                cantCaracteres++;
+            }
+            if(mensaje[i] == '*'){
+                cantCaracteres++;
+            }
+            if(mensaje[i] == '/'){
+                cantCaracteres++;
+            }
+            if(mensaje[i] == '!'){
+                cantCaracteres++;
+            }
+            if(mensaje[i] == '^'){
+                cantCaracteres++;
+            }
+        }
+
+        if(cantCaracteres != 1){
+            esValido = false;
+        }
+
+        return esValido;
+    }
     void RealizarCalculo(string calculo){
         char operacion;
         string mensajeAux = "";
         int i,num1,num2,posOperacion,totCaracteres=0;
+
+        if(!validarCalculo(calculo)){
+            mensajeAux = "No se pudo realizar la operacion se encontro un caracter no contemplado";
+        }
+
         //Tipo de Operacion
         for(i=1;calculo[i]!='\0';i++){
             if(calculo[i] == '+' || calculo[i] == '-' || calculo[i] == '/' || calculo[i] == '*' || calculo[i] == '!' || calculo[i] == '^'){
@@ -82,6 +135,7 @@ public:
             }
         }
         totCaracteres = i - 1 ;
+        cout<<totCaracteres<<endl;
         //Primera Operador
         num1 = convertirAEntero(calculo.substr(1,calculo.find(operacion)-1));
         //Segundo Operador
