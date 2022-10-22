@@ -160,7 +160,7 @@ public:
 
             break;
         }
-        for(int i=0;i<(int)strlen(mensajeAux.c_str()) + 1;i++){
+        for(int i=0;i<(int)strlen(mensajeAux.c_str());i++){
             this->mensaje[i] = mensajeAux[i];
         }
     }

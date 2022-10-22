@@ -56,16 +56,45 @@ public:
     }
 
     void RealizarCalculo(){
-        char bufferAux[1024];
+        string bufferAux = "";
+        int i,cantCaracteres = 0;
+        bool mensajeValido = true;
         cout<<"Ingrese el calculo que desea realizar: ";
-        cin>>bufferAux;
-        buffer[0] = 'a';
-        for(int i=1;i<1024;i++){
-            this->buffer[i] = bufferAux[i-1];
-        }
-        send(server, buffer, sizeof(buffer), 0);
-        memset(buffer, 0, sizeof(buffer));
-        cout << "Mensaje enviado!" << endl;
+        do{
+           cin>>bufferAux;
+           if(strlen(bufferAux.c_str())>24){
+            mensajeValido = false;
+            cout<<"La operacion debe tener entre 1 y 20 caracteres"<<endl;
+           }
+           if(buffer != "volver" && mensajeValido){
+            buffer[0] = 'a';
+            for(i = 1; i<1024;i++){
+                this->buffer[i] = bufferAux[i-1];
+            }
+            send(server, buffer, sizeof(buffer), 0);
+            memset(buffer, 0, sizeof(buffer));
+            cout << "Mensaje enviado!" << endl;
+            Recibir();
+           }
+
+        }while(bufferAux != "volver");
+        //cin>>bufferAux;
+        //cout<<strlen(bufferAux.c_str())<<endl;
+        //if(bufferAux == "volver"){
+          //  cout<<bufferAux<<endl;
+        //}
+        //if(strlen(bufferAux.c_str()) >24 ){
+         //   cout<<"La operacion debe tener entre 1 y 20 Caracteres"<<endl;
+       // }
+
+        //*buffer[0] = 'a';
+        //for(int i=1;i<1024;i++){
+          //  this->buffer[i] = bufferAux[i-1];
+        //}
+        //send(server, buffer, sizeof(buffer), 0);
+        //memset(buffer, 0, sizeof(buffer));
+        //cout << "Mensaje enviado!" << endl;
+       // Recibir();
     }
     void VerRegistroDeActividades(){
     }
@@ -84,6 +113,6 @@ int main()
     while(true)
     {
         Cliente->Enviar();
-        Cliente->Recibir();
+        //Cliente->Recibir();
     }
 }
