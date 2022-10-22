@@ -2,4 +2,9 @@ Cliente/bin/*
 Cliente/obj/*
 Servidor/obj/*
 Servidor/bin/*
-
+Cliente\bin\Debug\Cliente.exe
+Cliente\Cliente.depend
+Cliente\Cliente.layout
+Cliente\obj\Debug\main.o
+Servidor\Servidor.depend
+Servidor\Servidor.layout
