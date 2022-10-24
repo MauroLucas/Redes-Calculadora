@@ -81,41 +81,68 @@ public:
         }
         return esValido;
     }
-    bool validarCalculo(string mensaje){
+    bool validarCalculo(string mensaje, string& mensajeError){
         bool esValido = true;
-        int cantCaracteres = 0;
-        for(int i=0; mensaje[i]!='\0';i++){
+        int cantOperaciones = 0;
+        string caracterInvalido = "[abc]";
+        for(int i=1; mensaje[i]!='\0' && esValido == true;i++){
 
             //Verifico que el caracter sea correcto
             if(!validarCaracter(mensaje[i])){
                 esValido = false;
+
+                //Caracter Invalido
+                if(i!=1 && i!=(int)strlen(mensaje.c_str()) - 1){
+                    cout<<"Caracter invalido dentro dle mensaje"<<endl;
+                    caracterInvalido[1] = mensaje[i-1];
+                    caracterInvalido[2] = mensaje[i];
+                    caracterInvalido[3] = mensaje[i+1];
+                }
+                //Caracter Invalido al principio del mensaje
+                if(i == 1){
+                   caracterInvalido[1] = ' ';
+                   caracterInvalido[2] = mensaje[i];
+                   caracterInvalido[3] = mensaje[i + 1];
+                   cout<<caracterInvalido<<endl;
+                }
+                cout<<i<<endl;
+                cout<<(int)strlen(mensaje.c_str()) - 1<<endl;
+                //Caracter Invalido al final del mensaje
+                if( i == (int)strlen(mensaje.c_str()) - 1){
+                    caracterInvalido[1] = mensaje[i-1];
+                    caracterInvalido[2] = mensaje[i];
+                    caracterInvalido[3] = ' ';
+
+                }
+
+
             }
 
             //Hago un conteo de los caracteres de tipo operacion
             if(mensaje[i] == '+'){
-                cantCaracteres++;
+                cantOperaciones++;
             }
             if(mensaje[i] == '-'){
-                cantCaracteres++;
+                cantOperaciones++;
             }
             if(mensaje[i] == '*'){
-                cantCaracteres++;
+                cantOperaciones++;
             }
             if(mensaje[i] == '/'){
-                cantCaracteres++;
+                cantOperaciones++;
             }
             if(mensaje[i] == '!'){
-                cantCaracteres++;
+                cantOperaciones++;
             }
             if(mensaje[i] == '^'){
-                cantCaracteres++;
+                cantOperaciones++;
             }
         }
 
-        if(cantCaracteres != 1){
+        if(cantOperaciones != 1){
             esValido = false;
         }
-
+        mensajeError = "No se pudo realizar la operacion, se encontro un caracter no contemplado: " + caracterInvalido;
         return esValido;
     }
     void RealizarCalculo(string calculo){
@@ -123,10 +150,10 @@ public:
         string mensajeAux = "";
         int i,num1,num2,posOperacion,totCaracteres=0;
 
-        if(!validarCalculo(calculo)){
-            mensajeAux = "No se pudo realizar la operacion se encontro un caracter no contemplado";
+        if(!validarCalculo(calculo,mensajeAux)){
+            //mensajeAux = "No se pudo realizar la operacion se encontro un caracter no contemplado";
         }
-
+        cout<<mensajeAux<<endl;
         //Tipo de Operacion
         for(i=1;calculo[i]!='\0';i++){
             if(calculo[i] == '+' || calculo[i] == '-' || calculo[i] == '/' || calculo[i] == '*' || calculo[i] == '!' || calculo[i] == '^'){

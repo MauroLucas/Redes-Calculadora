@@ -73,7 +73,7 @@ public:
             }
             send(server, buffer, sizeof(buffer), 0);
             memset(buffer, 0, sizeof(buffer));
-            cout << "Mensaje enviado!" << endl;
+            //cout << "Mensaje enviado!" << endl;
             Recibir();
            }
 
