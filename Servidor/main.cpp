@@ -2,6 +2,10 @@
 #include <winsock2.h>
 #include <string>
 #include <math.h>
+#include <fstream>
+#include <sstream>
+#include <ctime>
+#include <iomanip>
 
 using namespace std;
 
@@ -12,30 +16,50 @@ public:
     SOCKADDR_IN serverAddr, clientAddr;
     char buffer[1024];
     char mensaje[4000];
+    int puerto = 5000;
     Server()
     {
+        serverLog("=============================");
+        serverLog("=======Inicia Servidor=======");
+        serverLog("=============================");
         WSAStartup(MAKEWORD(2,0), &WSAData);
         server = socket(AF_INET, SOCK_STREAM, 0);
 
         serverAddr.sin_addr.s_addr = INADDR_ANY;
         serverAddr.sin_family = AF_INET;
-        serverAddr.sin_port = htons(5555);
+        serverAddr.sin_port = htons(puerto);
 
         bind(server, (SOCKADDR *)&serverAddr, sizeof(serverAddr));
         listen(server, 0);
+        cout<<"Socket Creado. Puerto de escucha: " << to_string(puerto) << endl;
+        serverLog("Socket Creado. Puerto de escucha: " + to_string(puerto));
+
+
 
         cout << "Escuchando para conexiones entrantes." << endl;
         int clientAddrSize = sizeof(clientAddr);
         if((client = accept(server, (SOCKADDR *)&clientAddr, &clientAddrSize)) != INVALID_SOCKET)
         {
-            cout << "Cliente conectado!" << endl;
+            cout << "Conexion Aceptada" << endl;
+            serverLog("Conexion Aceptada");
         }
     }
 
     string Recibir()
     {
       char opcion;
-      recv(client, buffer, sizeof(buffer), 0);
+      int iResult;
+      bool desconectado = false;
+      while(!desconectado){
+        iResult = recv(client, buffer, sizeof(buffer), 0);
+        if(iResult == SOCKET_ERROR){
+            cout<<"Cliente Desconcetado"<<endl;
+            serverLog("Conexion Cerrada");
+            desconectado = true;
+        }
+      }
+
+      cout<<iResult<<endl;
       cout << "El cliente dice: " << buffer << endl;
       opcion = buffer[0];
       string mensaje;
@@ -118,6 +142,28 @@ public:
 
         return esValido;
     }
+    void serverLog(string mensaje){
+        fstream file;
+        file.open("server.log",ios::app | ios::out);
+        if(file.fail()){
+            cout<<"Error al acceder al archivo server.log";
+        }
+        file << getCurrentTime() << ": "<< mensaje.c_str() << endl;
+    }
+    string getCurrentTime(){
+
+        string fechaHora = "";
+        auto t = std::time(nullptr);
+        auto tm = *std::localtime(&t);
+        std::ostringstream oss;
+
+        oss << std::put_time(&tm, "%d-%m-%Y_%H:%M");
+        auto str = oss.str();
+        return str;
+
+
+
+    }
     void RealizarCalculo(string calculo){
         char operacion;
         string mensajeAux = "";
@@ -163,6 +209,7 @@ public:
         for(int i=0;i<(int)strlen(mensajeAux.c_str());i++){
             this->mensaje[i] = mensajeAux[i];
         }
+        Enviar();
     }
 
     void CerrarSocket()
@@ -179,6 +226,6 @@ int main()
   while(true)
   {
      Servidor->Recibir();
-     Servidor->Enviar();
+     //Servidor->Enviar();
   }
 }
