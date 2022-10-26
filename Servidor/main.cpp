@@ -48,18 +48,19 @@ public:
     string Recibir()
     {
       char opcion;
-      int iResult;
-      bool desconectado = false;
-      while(!desconectado){
-        iResult = recv(client, buffer, sizeof(buffer), 0);
-        if(iResult == SOCKET_ERROR){
-            cout<<"Cliente Desconcetado"<<endl;
-            serverLog("Conexion Cerrada");
-            desconectado = true;
-        }
-      }
+      //int iResult;
+      //bool desconectado = false;
+      //while(!desconectado){
+       // iResult = recv(client, buffer, sizeof(buffer), 0);
+       // if(iResult == SOCKET_ERROR){
+        //    cout<<"Cliente Desconcetado"<<endl;
+         //   serverLog("Conexion Cerrada");
+         //   desconectado = true;
+        //}
+      //}
 
-      cout<<iResult<<endl;
+      //cout<<iResult<<endl;
+      recv(client, buffer, sizeof(buffer), 0);
       cout << "El cliente dice: " << buffer << endl;
       opcion = buffer[0];
       string mensaje;
@@ -228,4 +229,5 @@ int main()
      Servidor->Recibir();
      //Servidor->Enviar();
   }
+  return 0;
 }
