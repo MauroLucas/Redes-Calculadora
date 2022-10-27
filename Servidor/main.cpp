@@ -40,6 +40,7 @@ public:
         {
             cout << "Cliente conectado!" << endl;
             ArchivoLog("Conexion Aceptada");
+
         }
     }
 
@@ -55,6 +56,10 @@ public:
       switch(opcion){
           case 'a': RealizarCalculo(mensaje);
           break;
+          case 'b': EnviarArchivoLog();
+          break;
+          case 'c': CerrarSocket();
+          break;
           default: break;
       }
       memset(buffer, 0, sizeof(buffer));
@@ -64,6 +69,32 @@ public:
         send(client, mensaje, sizeof(mensaje), 0);
         memset(mensaje, 0, sizeof(mensaje));
         cout << "Mensaje enviado!" << endl;
+    }
+    void EnviarArchivoLog(){
+        string linea;
+        ifstream archivo("server.log");
+        if(archivo){
+            cout<<"archivo encontrado"<<endl;
+            while(getline(archivo,linea)){
+                    //cout<<linea<<endl;
+                    for(int i =0; i<(int)strlen(linea.c_str())+1;i++){
+                        buffer[i] = linea[i];
+                    }
+                send(client,buffer,sizeof(buffer),0);
+                for(int i=0;i<sizeof(buffer);i++){
+                    cout<<buffer[i];
+                }
+                cout<<endl;
+                memset(buffer, 0, sizeof(buffer));
+
+            }
+            archivo.close();
+            linea = "EOF";
+            send(client,linea.c_str(),(int)strlen(linea.c_str())+1,0);
+            }else{
+                cout<<"error al intentar abrir el archivo server.log"<<endl;
+            }
+
     }
     int convertirAEntero(string a){
         int i = 0;

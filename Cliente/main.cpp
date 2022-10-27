@@ -81,6 +81,20 @@ public:
 
     }
     void VerRegistroDeActividades(){
+        string linea="";
+        this->buffer[0] = 'b';
+        send(server,buffer,sizeof(buffer),0);
+        memset(buffer, 0, sizeof(buffer));
+        while(mensaje != "EOF"){
+            recv(server, mensaje, sizeof(mensaje), 0);
+
+            if(mensaje[0] != 'E' && mensaje[1] != 'O' && mensaje[2] != 'F'){
+                cout<<mensaje<<endl;
+                memset(mensaje, 0, sizeof(mensaje));
+            }
+        }
+
+
     }
 
     void CerrarSocket()
