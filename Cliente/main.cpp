@@ -78,23 +78,7 @@ public:
            }
 
         }while(bufferAux != "volver");
-        //cin>>bufferAux;
-        //cout<<strlen(bufferAux.c_str())<<endl;
-        //if(bufferAux == "volver"){
-          //  cout<<bufferAux<<endl;
-        //}
-        //if(strlen(bufferAux.c_str()) >24 ){
-         //   cout<<"La operacion debe tener entre 1 y 20 Caracteres"<<endl;
-       // }
 
-        //*buffer[0] = 'a';
-        //for(int i=1;i<1024;i++){
-          //  this->buffer[i] = bufferAux[i-1];
-        //}
-        //send(server, buffer, sizeof(buffer), 0);
-        //memset(buffer, 0, sizeof(buffer));
-        //cout << "Mensaje enviado!" << endl;
-       // Recibir();
     }
     void VerRegistroDeActividades(){
     }

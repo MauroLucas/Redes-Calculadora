@@ -1,4 +1,8 @@
 #include <iostream>
+#include <iomanip>
+#include <ctime>
+#include <sstream>
+#include <fstream>
 #include <winsock2.h>
 #include <string>
 #include <math.h>
@@ -12,23 +16,30 @@ public:
     SOCKADDR_IN serverAddr, clientAddr;
     char buffer[1024];
     char mensaje[4000];
+    int puerto = 5000;
     Server()
     {
+        cout<<"Iniciar Servidor"<<endl;
+        ArchivoLog("================================");
+        ArchivoLog("==========Inicia Servidor=======");
+        ArchivoLog("================================");
         WSAStartup(MAKEWORD(2,0), &WSAData);
         server = socket(AF_INET, SOCK_STREAM, 0);
 
         serverAddr.sin_addr.s_addr = INADDR_ANY;
         serverAddr.sin_family = AF_INET;
-        serverAddr.sin_port = htons(5555);
+        serverAddr.sin_port = htons(puerto);
 
         bind(server, (SOCKADDR *)&serverAddr, sizeof(serverAddr));
         listen(server, 0);
 
-        cout << "Escuchando para conexiones entrantes." << endl;
+        cout << "Socket creado. Puerto de escucha " + to_string(puerto) << endl;
+        ArchivoLog("Socket creado. Puerto de escucha " + to_string(puerto));
         int clientAddrSize = sizeof(clientAddr);
         if((client = accept(server, (SOCKADDR *)&clientAddr, &clientAddrSize)) != INVALID_SOCKET)
         {
             cout << "Cliente conectado!" << endl;
+            ArchivoLog("Conexion Aceptada");
         }
     }
 
@@ -169,6 +180,31 @@ public:
     {
         closesocket(client);
         cout << "Socket cerrado, cliente desconectado." << endl;
+    }
+
+    string fechaHoraActual(){
+
+        auto t = std::time(nullptr);
+        auto tm = *std::localtime(&t);
+
+        std::ostringstream oss;
+        oss << std::put_time(&tm, "%d-%m-%Y %H-%M-%S");
+        auto str = oss.str();
+
+        return str;
+
+    }
+
+    void ArchivoLog(string mensaje){
+        fstream file;
+        file.open("server.log", ios::app | ios::out);
+        if(file.fail()){
+            cout<<"Error al acceder al archivo server.log";
+            exit(1);
+        }else{
+            file <<fechaHoraActual()<<":"<< mensaje.c_str() << endl;
+        }
+
     }
 };
 
