@@ -46,8 +46,8 @@ public:
         serverAddr.sin_addr.S_un.S_addr = inet_addr(ip.c_str());
 
         bind(server, (SOCKADDR *)&serverAddr, sizeof(serverAddr));
-        cout << "Socket creado. Puerto de escucha " + to_string(puerto) << endl;
-        ArchivoLog("Socket creado. Puerto de escucha " + to_string(puerto));
+        cout << "Socket creado. Puerto de escucha :" + to_string(puerto) << endl;
+        ArchivoLog("Socket creado. Puerto de escucha :" + to_string(puerto) + ".");
         listen(server, 0);
 
 
@@ -55,7 +55,7 @@ public:
         if((client = accept(server, (SOCKADDR *)&clientAddr, &clientAddrSize)) != INVALID_SOCKET)
         {
             cout << "Cliente conectado!" << endl;
-            ArchivoLog("Conexion Aceptada");
+            ArchivoLog("Conexión Aceptada.");
             clienteConectado = true;
             while(clienteConectado)
             {
@@ -77,13 +77,12 @@ public:
       if(resultado == SOCKET_ERROR){
         cout<<"Error al intentar escuchar al cliente"<<endl;
         clienteConectado = false;
-
+        ArchivoLog("Conexión Cerrada.");
       }
 
       opcion = buffer[0];
       string mensaje;
       mensaje.assign(buffer);
-      cout<<"mensaje :"<<mensaje<<endl;
       switch(opcion){
           case 'a': RealizarCalculo(mensaje);
           break;
@@ -116,17 +115,19 @@ public:
         ifstream archivo("server.log");
         if(archivo){
 
-            while(getline(archivo,linea)){
-
-                    EnviarMensaje(linea);
+            while(getline(archivo,linea))
+            {
+               EnviarMensaje(linea);
             }
             archivo.close();
             linea = "EOF";
             EnviarMensaje(linea);
 
-            }else{
-                cout<<"error al intentar abrir el archivo server.log"<<endl;
             }
+        else
+        {
+           cout<<"error al intentar abrir el archivo server.log"<<endl;
+        }
 
     }
     int convertirAEntero(string a){
@@ -389,15 +390,15 @@ public:
     {
         closesocket(client);
         clienteConectado = false;
-        ArchivoLog("Conexion Cerrada por Inactividad");
-        cout<<"Conexion Cerrada por Inactividad"<<endl;
+        ArchivoLog("Conexión Cerrada por Inactividad.");
+        cout<<"Conexión Cerrada por Inactividad"<<endl;
     }
 
     void CerrarSocket()
     {
         closesocket(client);
         clienteConectado = false;
-        ArchivoLog("Conexion Cerrada");
+        ArchivoLog("Conexión Cerrada.");
         cout << "Conexion Cerrada" << endl;
     }
 

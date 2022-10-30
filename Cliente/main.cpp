@@ -147,6 +147,7 @@ public:
             }
             send(server, buffer, sizeof(buffer), 0);
             memset(buffer, 0, sizeof(buffer));
+            tiempo = 0;
             Recibir();
         }
         }
@@ -161,19 +162,37 @@ public:
         }
     }
 
-    void VerRegistroDeActividades(){
+    void VerRegistroDeActividades()
+    {
         string linea="";
-        this->buffer[0] = 'b';
-        send(server,buffer,sizeof(buffer),0);
-        memset(buffer, 0, sizeof(buffer));
-        while(buffer[0] != 'E' && buffer[1] != 'O' && buffer[2] != 'F'){
-            recv(server, buffer, sizeof(buffer), 0);
+        if(!SuperoElTiempo())
+        {
+            this->buffer[0] = 'b';
+            send(server,buffer,sizeof(buffer),0);
+            memset(buffer, 0, sizeof(buffer));
+            tiempo = 0;
+            while(buffer[0] != 'E' && buffer[1] != 'O' && buffer[2] != 'F')
+                {
+                    recv(server, buffer, sizeof(buffer), 0);
+                    if(buffer[0] != 'E' && buffer[1] != 'O' && buffer[2] != 'F')
+                        {
+                            cout<<buffer<<endl;
+                        }
 
-            if(buffer[0] != 'E' && buffer[1] != 'O' && buffer[2] != 'F'){
-                cout<<buffer<<endl;
-                memset(buffer, 0, sizeof(buffer));
-            }
+                }
+             memset(buffer, 0, sizeof(buffer));
+
         }
+        else
+        {
+            cout<<"Cliente Desconectado por Inactividad"<<endl;
+            buffer[0] = 'd';
+            send(server,buffer,sizeof(buffer),0);
+            memset(buffer, 0, sizeof(buffer));
+            CerrarSocket();
+
+        }
+
 
       system("pause");
     }
