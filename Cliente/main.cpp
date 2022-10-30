@@ -2,6 +2,7 @@
 #include <winsock2.h>
 #include <string>
 #include <thread>
+#include <wchar.h>
 using namespace std;
 
 //Varibles Globales
@@ -89,6 +90,7 @@ public:
     {
         system("cls");
         int opcion = 0;
+
         cout<<"Que desea realizar?"<<endl;
         cout<<"1 - Realizar Calculo"<<endl;
         cout<<"2 - Ver registro de actividades"<<endl;
@@ -225,6 +227,9 @@ public:
 
 int main()
 {
+    //Aceptar Caracteres con acento
+    setlocale(LC_ALL, "");
+
     Client *Cliente = new Client();
     Cliente->IniciarCliente();
 

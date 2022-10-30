@@ -6,6 +6,7 @@
 #include <winsock2.h>
 #include <string>
 #include <math.h>
+#include <wchar.h>
 
 using namespace std;
 
@@ -430,6 +431,9 @@ public:
 
 int main()
 {
+  //Aceptar Caracteres con acento
+  setlocale(LC_ALL, "");
+
   Server *Servidor = new Server();
   Servidor->IniciarServidor();
 
