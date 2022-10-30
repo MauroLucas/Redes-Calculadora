@@ -18,12 +18,14 @@ public:
     char mensaje[4000];
     int puerto = 5000;
     bool clienteConectado;
+    string ip;
     Server()
     {
         //Limpieza de datos
         memset(buffer, 0, sizeof(buffer));
         memset(mensaje, 0, sizeof(mensaje));
         clienteConectado = false;
+        ip = "127.0.0.1";
     }
 
     void IniciarServidor()
@@ -40,6 +42,7 @@ public:
         serverAddr.sin_addr.s_addr = INADDR_ANY;
         serverAddr.sin_family = AF_INET;
         serverAddr.sin_port = htons(puerto);
+        serverAddr.sin_addr.S_un.S_addr = inet_addr(ip.c_str());
 
         bind(server, (SOCKADDR *)&serverAddr, sizeof(serverAddr));
         cout << "Socket creado. Puerto de escucha " + to_string(puerto) << endl;
@@ -74,8 +77,7 @@ public:
       if(resultado == SOCKET_ERROR){
         cout<<"Error al intentar escuchar al cliente"<<endl;
         clienteConectado = false;
-        //ArchivoLog("Error al intentar escuchar al cliente");
-        //exit(1);
+
       }
       cout << "El cliente dice: " << buffer << endl;
       opcion = buffer[0];

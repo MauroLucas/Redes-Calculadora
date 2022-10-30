@@ -23,7 +23,6 @@ public:
 
     Client()
     {
-        //Limpieza de variables
         memset(ip, 0, sizeof(ip));
         memset(buffer, 0, sizeof(buffer));
         servidorConectado = false;
@@ -41,6 +40,7 @@ public:
         system("cls");
         cout<<"Conectando al servidor..."<<endl<<endl;
         WSAStartup(MAKEWORD(2,0), &WSAData);
+
         //Creacion del Socket
         server = socket(AF_INET, SOCK_STREAM, 0);
         if(server == INVALID_SOCKET)
@@ -50,6 +50,7 @@ public:
             WSACleanup();
             exit(1);
         }
+
         cout<<"Ingrese la direccion IP a la que desea conectarse"<<endl;
         cin>>this->ip;
         cout<<"Ingrese el puerto"<<endl;
