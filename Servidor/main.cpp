@@ -14,8 +14,7 @@ public:
     WSADATA WSAData;
     SOCKET server, client;
     SOCKADDR_IN serverAddr, clientAddr;
-    char buffer[1024];
-    char mensaje[1024];
+    char buffer[1024],mensaje[1024];
     int puerto = 5000;
     bool clienteConectado;
     string ip;
@@ -320,10 +319,7 @@ public:
             }
         }
 
-
-
-
-        return esValido;
+      return esValido;
 
     }
 
@@ -383,10 +379,8 @@ public:
             default:  respuesta = to_string(num1);
         }
 
-
-
-         EnviarMensaje(respuesta);
-        }
+        EnviarMensaje(respuesta);
+      }
 
 
     }
@@ -429,7 +423,6 @@ public:
         }else{
             file <<fechaHoraActual()<<":"<< mensaje.c_str() << endl;
         }
-
     }
 };
 
