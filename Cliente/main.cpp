@@ -8,15 +8,16 @@ using namespace std;
 int tiempo = 0;
 bool timeOut = false;
 
+//Funciones Globales
 void temporizador(int segundos);
 
+//Clases
 class Client{
 public:
     WSADATA WSAData;
     SOCKET server;
     SOCKADDR_IN addr;
     char buffer[1024];
-    char mensaje[1024];
     char ip[1024];
     int puerto, tiempoMaximo;
     bool servidorConectado;
@@ -109,9 +110,9 @@ public:
 
     void Recibir()
     {
-        recv(server, mensaje, sizeof(mensaje), 0);
-        cout<<"Respuesta :"<< mensaje << endl;
-        memset(mensaje, 0, sizeof(mensaje));
+        recv(server, buffer, sizeof(buffer), 0);
+        cout<<"Respuesta :"<< buffer << endl;
+        memset(buffer, 0, sizeof(buffer));
     }
 
     bool SuperoElTiempo()
@@ -146,7 +147,6 @@ public:
             }
             send(server, buffer, sizeof(buffer), 0);
             memset(buffer, 0, sizeof(buffer));
-            //EnviarMensaje(bufferAux);
             Recibir();
         }
         }
@@ -166,12 +166,12 @@ public:
         this->buffer[0] = 'b';
         send(server,buffer,sizeof(buffer),0);
         memset(buffer, 0, sizeof(buffer));
-        while(mensaje[0] != 'E' && mensaje[1] != 'O' && mensaje[2] != 'F'){
-            recv(server, mensaje, sizeof(mensaje), 0);
+        while(buffer[0] != 'E' && buffer[1] != 'O' && buffer[2] != 'F'){
+            recv(server, buffer, sizeof(buffer), 0);
 
-            if(mensaje[0] != 'E' && mensaje[1] != 'O' && mensaje[2] != 'F'){
-                cout<<mensaje<<endl;
-                memset(mensaje, 0, sizeof(mensaje));
+            if(buffer[0] != 'E' && buffer[1] != 'O' && buffer[2] != 'F'){
+                cout<<buffer<<endl;
+                memset(buffer, 0, sizeof(buffer));
             }
         }
 
@@ -181,24 +181,16 @@ public:
     void CerrarSocket()
     {
        buffer[0] = 'c';
-       EnviarMensaje(mensaje);
-       //send(server,buffer,sizeof(buffer),0);
-       //memset(buffer, 0, sizeof(buffer));
+       send(server,buffer,sizeof(buffer),0);
+       memset(buffer, 0, sizeof(buffer));
        servidorConectado = false;
        tiempo = 0;
        closesocket(server);
        cout<<"Se cerro la conexion con el servidor"<<endl;
        system("pause");
-       //WSACleanup();
-       //cout << "Socket cerrado." << endl << endl;
+
     }
-    void EnviarMensaje(string mensaje){
-        for(int i = 0; i<(int)strlen(mensaje.c_str())+1;i++){
-            this->mensaje[i] = mensaje[i];
-        }
-        send(server, buffer, sizeof(buffer), 0);
-        memset(buffer, 0, sizeof(buffer));
-    }
+
 };
 
  void temporizador(int segundos)
