@@ -92,9 +92,9 @@ public:
         int opcion = 0;
 
         cout<<"Ingrese la opción que desea realizar:"<<endl;
-        cout<<"1 - Realizar Calculo"<<endl;
+        cout<<"1 - Realizar cálculo"<<endl;
         cout<<"2 - Ver registro de actividades"<<endl;
-        cout<<"3 - Cerrar Sesion"<<endl;
+        cout<<"3 - Cerrar sesión"<<endl;
         cin>>opcion;
         switch(opcion){
             case 1: RealizarCalculo();
@@ -207,7 +207,7 @@ public:
        servidorConectado = false;
        tiempo = 0;
        closesocket(server);
-       cout<<"Se cerro la conexion con el servidor"<<endl;
+       cout<<"Se cerro la conexión con el servidor"<<endl;
        system("pause");
 
     }
