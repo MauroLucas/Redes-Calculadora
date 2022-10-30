@@ -27,7 +27,7 @@ public:
         memset(buffer, 0, sizeof(buffer));
         servidorConectado = false;
         timeOut = false;
-        tiempoMaximo = 60;
+        tiempoMaximo = 10;
 
     }
     void IniciarCliente()
@@ -110,20 +110,20 @@ public:
     void Recibir()
     {
         recv(server, mensaje, sizeof(mensaje), 0);
-        cout << mensaje << endl;
+        cout<<"Respuesta :"<< mensaje << endl;
         memset(mensaje, 0, sizeof(mensaje));
     }
 
-    bool SuperoElTiempo(int segundos)
+    bool SuperoElTiempo()
     {
         bool superoElTiempo = false;
-        if(tiempo>segundos){
+        if(tiempo>this->tiempoMaximo){
             superoElTiempo = true;
         }
         return superoElTiempo;
     }
     void RealizarCalculo(){
-        if(!SuperoElTiempo(tiempoMaximo)){
+        if(!SuperoElTiempo()){
 
 
         string input = "";
@@ -150,17 +150,17 @@ public:
             Recibir();
         }
         }
-        /*do{
 
-           }
-
-        }while(input != "volver"); */
         }
         else{
             cout<<"Cliente Desconectado por Inactividad"<<endl;
+            buffer[0] = 'd';
+            send(server,buffer,sizeof(buffer),0);
+            memset(buffer, 0, sizeof(buffer));
             CerrarSocket();
         }
     }
+
     void VerRegistroDeActividades(){
         string linea="";
         this->buffer[0] = 'b';
@@ -193,7 +193,7 @@ public:
        //cout << "Socket cerrado." << endl << endl;
     }
     void EnviarMensaje(string mensaje){
-        for(int i = 0; i<(int)strlen(mensaje.c_str());i++){
+        for(int i = 0; i<(int)strlen(mensaje.c_str())+1;i++){
             this->mensaje[i] = mensaje[i];
         }
         send(server, buffer, sizeof(buffer), 0);

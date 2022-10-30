@@ -82,7 +82,7 @@ public:
       opcion = buffer[0];
       string mensaje;
       mensaje.assign(buffer);
-
+      cout<<"mensaje :"<<mensaje<<endl;
       switch(opcion){
           case 'a': RealizarCalculo(mensaje);
           break;
@@ -90,6 +90,7 @@ public:
           break;
           case 'c': CerrarSocket();
           break;
+          case 'd': TiempoInactividad();
           default: break;
       }
       memset(buffer, 0, sizeof(buffer));
@@ -386,6 +387,13 @@ public:
         }
 
 
+    }
+
+    void TiempoInactividad()
+    {
+        closesocket(client);
+        clienteConectado = false;
+        cout<<"Socket cerrado por inactividad del cliente"<<endl;
     }
 
     void CerrarSocket()
