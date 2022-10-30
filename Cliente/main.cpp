@@ -127,18 +127,15 @@ public:
 
 
         string input = "";
-        //char input[1021];
         int i,cantCaracteres = 0;
         bool mensajeValido = true;
         cout<<"Ingrese el calculo que desea realizar: "<<endl;
-        do{
-           mensajeValido = true;
-           cin>>input;
-           //fgets(input,1021,stdin);
-           //for(i=0; i<input[i]!='\0';i++){
-            //bufferAux[i] = input[i];
-           //}
-           if(strlen(input.c_str())>20 || input[0] == '\n'){
+        getline(cin,input);
+        while( input != "volver")
+        {
+            mensajeValido = true;
+           getline(cin,input);
+           if(strlen(input.c_str())>20 || input == ""){
             mensajeValido = false;
             cout<<"La operacion debe tener entre 1 y 20 caracteres"<<endl;
            }
@@ -151,9 +148,13 @@ public:
             memset(buffer, 0, sizeof(buffer));
             //EnviarMensaje(bufferAux);
             Recibir();
+        }
+        }
+        /*do{
+
            }
 
-        }while(input != "volver");
+        }while(input != "volver"); */
         }
         else{
             cout<<"Cliente Desconectado por Inactividad"<<endl;
