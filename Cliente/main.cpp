@@ -91,7 +91,7 @@ public:
         system("cls");
         int opcion = 0;
 
-        cout<<"Que desea realizar?"<<endl;
+        cout<<"Ingrese la opción que desea realizar:"<<endl;
         cout<<"1 - Realizar Calculo"<<endl;
         cout<<"2 - Ver registro de actividades"<<endl;
         cout<<"3 - Cerrar Sesion"<<endl;
@@ -132,7 +132,7 @@ public:
         string input = "";
         int i,cantCaracteres = 0;
         bool mensajeValido = true;
-        cout<<"Ingrese el calculo que desea realizar: "<<endl;
+        cout<<"Ingrese el cálculo que desea realizar: "<<endl;
         getline(cin,input);
         while( input != "volver")
         {
