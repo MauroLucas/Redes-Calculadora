@@ -3,7 +3,9 @@
 	<iostream>
 	<winsock2.h>
 
-1666213500 source:c:\repositorios\redes_calculadora\cliente\main.cpp
+1667084689 source:c:\repositorios\redes_calculadora\cliente\main.cpp
 	<iostream>
 	<winsock2.h>
+	<string>
+	<thread>
 

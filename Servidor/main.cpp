@@ -14,11 +14,22 @@ public:
     WSADATA WSAData;
     SOCKET server, client;
     SOCKADDR_IN serverAddr, clientAddr;
-    char buffer[1024];
+    char buffer[4000];
     char mensaje[4000];
     int puerto = 5000;
+    bool clienteConectado;
     Server()
     {
+        //Limpieza de datos
+        memset(buffer, 0, sizeof(buffer));
+        memset(mensaje, 0, sizeof(mensaje));
+        clienteConectado = false;
+    }
+
+    void IniciarServidor()
+    {
+        //Blucle Infinito del servidor
+        while(true){
         cout<<"Iniciar Servidor"<<endl;
         ArchivoLog("================================");
         ArchivoLog("==========Inicia Servidor=======");
@@ -31,28 +42,47 @@ public:
         serverAddr.sin_port = htons(puerto);
 
         bind(server, (SOCKADDR *)&serverAddr, sizeof(serverAddr));
-        listen(server, 0);
-
         cout << "Socket creado. Puerto de escucha " + to_string(puerto) << endl;
         ArchivoLog("Socket creado. Puerto de escucha " + to_string(puerto));
+        listen(server, 0);
+
+
         int clientAddrSize = sizeof(clientAddr);
         if((client = accept(server, (SOCKADDR *)&clientAddr, &clientAddrSize)) != INVALID_SOCKET)
         {
             cout << "Cliente conectado!" << endl;
             ArchivoLog("Conexion Aceptada");
+            clienteConectado = true;
+            while(clienteConectado)
+            {
+                Recibir();
+
+            }
+
+        }
+        //Limpiar Winsock
+        WSACleanup();
 
         }
     }
 
-    string Recibir()
+    void Recibir()
     {
       char opcion;
-      recv(client, buffer, sizeof(buffer), 0);
+      cout<<"Escuchando"<<endl;
+      int resultado = recv(client, buffer, sizeof(buffer), 0);
+      if(resultado == SOCKET_ERROR){
+        cout<<"Error al intentar escuchar al cliente"<<endl;
+        clienteConectado = false;
+        //ArchivoLog("Error al intentar escuchar al cliente");
+        //exit(1);
+      }
       cout << "El cliente dice: " << buffer << endl;
       opcion = buffer[0];
       string mensaje;
       mensaje.assign(buffer);
       cout<<opcion<<endl;
+      cout<<"Switch"<<endl;
       switch(opcion){
           case 'a': RealizarCalculo(mensaje);
           break;
@@ -63,6 +93,16 @@ public:
           default: break;
       }
       memset(buffer, 0, sizeof(buffer));
+    }
+    void EnviarMensaje(string m)
+    {
+        cout<<"Enviar Mensaje"<<endl;
+        for(int i=0;i<(int)strlen(m.c_str());i++){
+            this->mensaje[i] = m[i];
+        }
+        send(client, mensaje, sizeof(mensaje), 0);
+        memset(mensaje, 0, sizeof(mensaje));
+
     }
     void Enviar()
     {
@@ -91,6 +131,7 @@ public:
             archivo.close();
             linea = "EOF";
             send(client,linea.c_str(),(int)strlen(linea.c_str())+1,0);
+            memset(mensaje, 0, sizeof(mensaje));
             }else{
                 cout<<"error al intentar abrir el archivo server.log"<<endl;
             }
@@ -123,65 +164,158 @@ public:
         }
         return esValido;
     }
-    bool validarCalculo(string mensaje){
+    bool esOperacion(char c)
+    {
+        bool operacion = false;
+        if(c == '+' || c == '-' || c == '*' || c == '/' || c == '!' || c== '^'){
+            operacion = true;
+        }
+        return operacion;
+    }
+    bool esNumero(char c)
+    {
+        bool numero = false;
+        if(c == '0' || c == '1' || c == '2' || c == '3' || c == '4' || c == '5' || c == '6' || c == '7' || c == '8' || c == '9'){
+            numero = true;
+        }
+        return numero;
+    }
+    bool ValidarCaracteresCalculo(string mensaje)
+    {
         bool esValido = true;
-        int cantCaracteres = 0;
-        for(int i=0; mensaje[i]!='\0';i++){
-
-            //Verifico que el caracter sea correcto
+        char caracterInvalido;
+        for(int i=1;mensaje[i]!='\0' && esValido == true ;i++){
             if(!validarCaracter(mensaje[i])){
                 esValido = false;
-            }
-
-            //Hago un conteo de los caracteres de tipo operacion
-            if(mensaje[i] == '+'){
-                cantCaracteres++;
-            }
-            if(mensaje[i] == '-'){
-                cantCaracteres++;
-            }
-            if(mensaje[i] == '*'){
-                cantCaracteres++;
-            }
-            if(mensaje[i] == '/'){
-                cantCaracteres++;
-            }
-            if(mensaje[i] == '!'){
-                cantCaracteres++;
-            }
-            if(mensaje[i] == '^'){
-                cantCaracteres++;
+                caracterInvalido = mensaje[i];
             }
         }
-
-        if(cantCaracteres != 1){
-            esValido = false;
+        if(!esValido)
+        {
+           EnviarMensaje("No se pudo realizar la operacion, se encontro un caracter no contemplado :" + string(1,caracterInvalido));
         }
 
         return esValido;
     }
-    void RealizarCalculo(string calculo){
-        char operacion;
-        string mensajeAux = "";
-        int i,num1,num2,posOperacion,totCaracteres=0;
+    bool ValidarOperacionCalculo(string mensaje)
+    {
+        bool esValido = true;
+        bool operacionEncontrada = false;
+        char operacion,a,b,c;
+        int posicionOperacion = 0,cantCaracteres = 0,totCaracteres = 0, num1, num2;
+        int i;
 
-        if(!validarCalculo(calculo)){
-            mensajeAux = "No se pudo realizar la operacion se encontro un caracter no contemplado";
+        //Busco la operacion
+        for(i=1;mensaje[i]!='\0';i++){
+                if(esOperacion(mensaje[i])){
+                    operacionEncontrada = true;
+                    operacion = mensaje[i];
+                    posicionOperacion = i;
+                }
+
+        }
+        totCaracteres = i-1;
+        num1 = convertirAEntero(mensaje.substr(1,mensaje.find(operacion)-1));
+        num2 = convertirAEntero(mensaje.substr(mensaje.find(operacion) + 1,totCaracteres - 1));
+        cout<<"Validacion de *"<<endl;
+        cout<<"Operacion : "<<operacion<<endl;
+
+        if(esOperacion(mensaje[posicionOperacion - 1]) || esOperacion(mensaje[posicionOperacion + 1])){
+            //esValido = false;
+            EnviarMensaje("No se pudo realizar la operacion, la operacion esta mal formada: " + string(1,mensaje[posicionOperacion -1]) + string(1,mensaje[posicionOperacion]) + string(1,mensaje[posicionOperacion + 1]));
+            return false;
         }
 
-        //Tipo de Operacion
-        for(i=1;calculo[i]!='\0';i++){
+        if(operacion == '+'){
+            if(esNumero(mensaje[posicionOperacion -1]) && esNumero(mensaje[posicionOperacion +1 ])){
+                cout<<"La suma esta correcta"<<endl;
+            }
+        }
+
+        if(operacion == '!'){
+            if(esNumero(mensaje[posicionOperacion + 1])){
+                esValido = false;
+                //En caso de que el error se encuentre al principio
+                if(mensaje[posicionOperacion - 1] == 'a')
+                {
+                    EnviarMensaje("No se pudo realizar la operacion, la operacion esta mal formada: " + string(1,mensaje[posicionOperacion]) + string(1,mensaje[posicionOperacion + 1]));
+                }
+                else
+                {
+                    EnviarMensaje("No se pudo realizar la operacion, la operacion esta mal formada: " + string(1,mensaje[posicionOperacion -1]) + string(1,mensaje[posicionOperacion]) + string(1,mensaje[posicionOperacion + 1]));
+                }
+
+            }
+        }
+        if(operacion == '*'){
+                if(esNumero(mensaje[posicionOperacion - 1]) && esNumero(mensaje[posicionOperacion + 1])){
+                    cout<<"La operacion es correcta"<<endl;
+                }
+                else
+                {
+                    cout<<"La operacion es incorrecta"<<endl;
+                    if(mensaje[posicionOperacion - 1] == 'a')
+                    {
+                        EnviarMensaje("No se pudo realizar la operacion, la operacion esta mal formada: " + string(1,mensaje[posicionOperacion]) + string(1,mensaje[posicionOperacion + 1]));
+                    }
+                    else
+                    {
+                        EnviarMensaje("No se pudo realizar la operacion, la operacion esta mal formada: " + string(1,mensaje[posicionOperacion -1]) + string(1,mensaje[posicionOperacion]) + string(1,mensaje[posicionOperacion + 1]));
+                    }
+                    return false;
+
+                }
+        }
+
+
+
+
+        return esValido;
+
+    }
+
+
+
+    void RealizarCalculo(string calculo){
+        char operacion,a,b,c,caracterInvalido = true,operacionInvalida = true;
+        string mensajeAux = "";
+        bool caracterEncontrado = false;
+        int i,num1,num2,posOperacion,totCaracteres=0, tipoError = 0;
+
+        //tipoError = tipoErrorCalculo(calculo);
+        //cout<<"tipo error "<<tipoError<<endl;
+        //Se encontro un caracter invalido
+        //Validar Caracteres Invalidos
+        if(!ValidarCaracteresCalculo(calculo))
+        {
+            cout<<"Se encontraron caracteres invalidos"<<endl;
+            caracterInvalido = false;
+        }
+        if(!ValidarOperacionCalculo(calculo))
+        {
+           cout<<"La operacion esta mal formada"<<endl;
+           operacionInvalida = false;
+        }
+
+
+        //No se encontraron errores en la operacion
+        if(caracterInvalido == true && operacionInvalida == true)
+        {
+            cout<<"No se encontraron errores"<<endl;
+            for(i=1;calculo[i]!='\0';i++){
             if(calculo[i] == '+' || calculo[i] == '-' || calculo[i] == '/' || calculo[i] == '*' || calculo[i] == '!' || calculo[i] == '^'){
                operacion = calculo[i];
                posOperacion = i;
             }
         }
         totCaracteres = i - 1 ;
-        cout<<totCaracteres<<endl;
+        cout<<"Total Caracteres " + to_string(totCaracteres)<<endl;
         //Primera Operador
         num1 = convertirAEntero(calculo.substr(1,calculo.find(operacion)-1));
         //Segundo Operador
         num2 = convertirAEntero(calculo.substr(calculo.find(operacion) + 1,totCaracteres - 1));
+        cout<<"numero 1 " + to_string(num1)<<endl;
+        cout<<"numero 2 " + to_string(num2)<<endl;
         switch(operacion){
             case '+': mensajeAux = to_string(num1+num2);
 
@@ -199,17 +333,23 @@ public:
 
             break;
             case '^': mensajeAux = to_string((int)pow(num1,num2));
-
             break;
+
+            default:  mensajeAux = to_string(num1);
         }
-        for(int i=0;i<(int)strlen(mensajeAux.c_str());i++){
-            this->mensaje[i] = mensajeAux[i];
+
+
+
+         EnviarMensaje(mensajeAux);
         }
+
+
     }
 
     void CerrarSocket()
     {
         closesocket(client);
+        clienteConectado = false;
         cout << "Socket cerrado, cliente desconectado." << endl;
     }
 
@@ -243,9 +383,6 @@ public:
 int main()
 {
   Server *Servidor = new Server();
-  while(true)
-  {
-     Servidor->Recibir();
-     Servidor->Enviar();
-  }
+  Servidor->IniciarServidor();
+
 }

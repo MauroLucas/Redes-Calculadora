@@ -3,8 +3,12 @@
 	<iostream>
 	<winsock2.h>
 
-1666304414 source:c:\repositorios\redes_calculadora\servidor\main.cpp
+1667084796 source:c:\repositorios\redes_calculadora\servidor\main.cpp
 	<iostream>
+	<iomanip>
+	<ctime>
+	<sstream>
+	<fstream>
 	<winsock2.h>
 	<string>
 	<math.h>
