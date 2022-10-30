@@ -15,8 +15,8 @@ public:
     WSADATA WSAData;
     SOCKET server;
     SOCKADDR_IN addr;
-    char buffer[4000];
-    char mensaje[4000];
+    char buffer[1024];
+    char mensaje[1024];
     char ip[1024];
     int puerto, tiempoMaximo;
     bool servidorConectado;
@@ -126,33 +126,34 @@ public:
         if(!SuperoElTiempo(tiempoMaximo)){
 
 
-        string bufferAux = "";
-        char input[1021];
+        string input = "";
+        //char input[1021];
         int i,cantCaracteres = 0;
         bool mensajeValido = true;
-        cout<<"Ingrese el calculo que desea realizar: ";
+        cout<<"Ingrese el calculo que desea realizar: "<<endl;
         do{
            mensajeValido = true;
-           cin>>bufferAux;
+           cin>>input;
            //fgets(input,1021,stdin);
            //for(i=0; i<input[i]!='\0';i++){
             //bufferAux[i] = input[i];
            //}
-           if(strlen(bufferAux.c_str())>20 || bufferAux[0] == '\n'){
+           if(strlen(input.c_str())>20 || input[0] == '\n'){
             mensajeValido = false;
             cout<<"La operacion debe tener entre 1 y 20 caracteres"<<endl;
            }
-           if(bufferAux != "volver" && mensajeValido){
+           if(input != "volver" && mensajeValido){
             buffer[0] = 'a';
             for(i = 1; i<1024;i++){
-                this->buffer[i] = bufferAux[i-1];
+                this->buffer[i] = input[i-1];
             }
             send(server, buffer, sizeof(buffer), 0);
             memset(buffer, 0, sizeof(buffer));
+            //EnviarMensaje(bufferAux);
             Recibir();
            }
 
-        }while(bufferAux != "volver");
+        }while(input != "volver");
         }
         else{
             cout<<"Cliente Desconectado por Inactividad"<<endl;
@@ -180,8 +181,8 @@ public:
     {
        buffer[0] = 'c';
        EnviarMensaje(mensaje);
-       send(server,buffer,sizeof(buffer),0);
-       memset(buffer, 0, sizeof(buffer));
+       //send(server,buffer,sizeof(buffer),0);
+       //memset(buffer, 0, sizeof(buffer));
        servidorConectado = false;
        tiempo = 0;
        closesocket(server);
@@ -205,11 +206,6 @@ public:
         while(true)
         {
             Sleep(1000); //1 segundo
-            //if(tiempo == segundos)
-            //{
-              //  cout<<"Se llego al limite de tiempo"<<endl;
-
-            //}
             tiempo++;
 
         }

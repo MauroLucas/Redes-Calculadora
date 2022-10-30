@@ -14,8 +14,8 @@ public:
     WSADATA WSAData;
     SOCKET server, client;
     SOCKADDR_IN serverAddr, clientAddr;
-    char buffer[4000];
-    char mensaje[4000];
+    char buffer[1024];
+    char mensaje[1024];
     int puerto = 5000;
     bool clienteConectado;
     string ip;
@@ -72,19 +72,17 @@ public:
     void Recibir()
     {
       char opcion;
-      cout<<"Escuchando"<<endl;
       int resultado = recv(client, buffer, sizeof(buffer), 0);
       if(resultado == SOCKET_ERROR){
         cout<<"Error al intentar escuchar al cliente"<<endl;
         clienteConectado = false;
 
       }
-      cout << "El cliente dice: " << buffer << endl;
+
       opcion = buffer[0];
       string mensaje;
       mensaje.assign(buffer);
-      cout<<opcion<<endl;
-      cout<<"Switch"<<endl;
+
       switch(opcion){
           case 'a': RealizarCalculo(mensaje);
           break;
@@ -98,7 +96,6 @@ public:
     }
     void EnviarMensaje(string m)
     {
-        cout<<"Enviar Mensaje"<<endl;
         for(int i=0;i<(int)strlen(m.c_str());i++){
             this->mensaje[i] = m[i];
         }
@@ -106,7 +103,7 @@ public:
         memset(mensaje, 0, sizeof(mensaje));
 
     }
-    void Enviar()
+    void EnviarMensaje()
     {
         send(client, mensaje, sizeof(mensaje), 0);
         memset(mensaje, 0, sizeof(mensaje));
@@ -116,24 +113,15 @@ public:
         string linea;
         ifstream archivo("server.log");
         if(archivo){
-            cout<<"archivo encontrado"<<endl;
-            while(getline(archivo,linea)){
-                    //cout<<linea<<endl;
-                    for(int i =0; i<(int)strlen(linea.c_str())+1;i++){
-                        buffer[i] = linea[i];
-                    }
-                send(client,buffer,sizeof(buffer),0);
-                for(int i=0;i<sizeof(buffer);i++){
-                    cout<<buffer[i];
-                }
-                cout<<endl;
-                memset(buffer, 0, sizeof(buffer));
 
+            while(getline(archivo,linea)){
+
+                    EnviarMensaje(linea);
             }
             archivo.close();
             linea = "EOF";
-            send(client,linea.c_str(),(int)strlen(linea.c_str())+1,0);
-            memset(mensaje, 0, sizeof(mensaje));
+            EnviarMensaje(linea);
+
             }else{
                 cout<<"error al intentar abrir el archivo server.log"<<endl;
             }
@@ -158,10 +146,10 @@ public:
     bool validarCaracter(char c){
         bool esValido = false;
 
-        if(c == '+' || c == '-' || c == '*' || c == '/' || c == '!' || c== '^'){
+        if(esOperacion(c)){
             esValido = true;
         }
-        if(c == '0' || c == '1' || c == '2' || c == '3' || c == '4' || c == '5' || c == '6' || c == '7' || c == '8' || c == '9'){
+        if(esNumero(c)){
             esValido = true;
         }
         return esValido;
@@ -202,15 +190,13 @@ public:
     bool ValidarOperacionCalculo(string mensaje)
     {
         bool esValido = true;
-        bool operacionEncontrada = false;
-        char operacion,a,b,c;
-        int posicionOperacion = 0,cantCaracteres = 0,totCaracteres = 0, num1, num2;
+        char operacion;
+        int posicionOperacion = 0,totCaracteres = 0,num1, num2;
         int i;
 
         //Busco la operacion
         for(i=1;mensaje[i]!='\0';i++){
                 if(esOperacion(mensaje[i])){
-                    operacionEncontrada = true;
                     operacion = mensaje[i];
                     posicionOperacion = i;
                 }
@@ -219,21 +205,44 @@ public:
         totCaracteres = i-1;
         num1 = convertirAEntero(mensaje.substr(1,mensaje.find(operacion)-1));
         num2 = convertirAEntero(mensaje.substr(mensaje.find(operacion) + 1,totCaracteres - 1));
-        cout<<"Validacion de *"<<endl;
-        cout<<"Operacion : "<<operacion<<endl;
-
+        //Validaciones generales
         if(esOperacion(mensaje[posicionOperacion - 1]) || esOperacion(mensaje[posicionOperacion + 1])){
             //esValido = false;
             EnviarMensaje("No se pudo realizar la operacion, la operacion esta mal formada: " + string(1,mensaje[posicionOperacion -1]) + string(1,mensaje[posicionOperacion]) + string(1,mensaje[posicionOperacion + 1]));
             return false;
         }
 
+        //Validaciones de operacion suma
         if(operacion == '+'){
-            if(esNumero(mensaje[posicionOperacion -1]) && esNumero(mensaje[posicionOperacion +1 ])){
-                cout<<"La suma esta correcta"<<endl;
+            if(!esNumero(mensaje[posicionOperacion -1])  || !esNumero(mensaje[posicionOperacion + 1 ])){
+                if(mensaje[posicionOperacion -1] == 'a')
+                {
+                     EnviarMensaje("No se pudo realizar la operacion, la operacion esta mal formada: " + string(1,mensaje[posicionOperacion]) + string(1,mensaje[posicionOperacion + 1]));
+                }
+                else
+                {
+                    EnviarMensaje("No se pudo realizar la operacion, la operacion esta mal formada: " + string(1,mensaje[posicionOperacion -1]) + string(1,mensaje[posicionOperacion]) + string(1,mensaje[posicionOperacion + 1]));
+                }
+                return false;
             }
         }
 
+        //Validaciones de operacion resta
+        if(operacion == '-'){
+            if(!esNumero(mensaje[posicionOperacion -1])  || !esNumero(mensaje[posicionOperacion + 1 ])){
+                if(mensaje[posicionOperacion -1] == 'a')
+                {
+                     EnviarMensaje("No se pudo realizar la operacion, la operacion esta mal formada: " + string(1,mensaje[posicionOperacion]) + string(1,mensaje[posicionOperacion + 1]));
+                }
+                else
+                {
+                    EnviarMensaje("No se pudo realizar la operacion, la operacion esta mal formada: " + string(1,mensaje[posicionOperacion -1]) + string(1,mensaje[posicionOperacion]) + string(1,mensaje[posicionOperacion + 1]));
+                }
+                return false;
+            }
+        }
+
+        //Validaciones de tipo factorial
         if(operacion == '!'){
             if(esNumero(mensaje[posicionOperacion + 1])){
                 esValido = false;
@@ -249,13 +258,15 @@ public:
 
             }
         }
+
+        //Validaciones de tipo multiplicacion
         if(operacion == '*'){
                 if(esNumero(mensaje[posicionOperacion - 1]) && esNumero(mensaje[posicionOperacion + 1])){
-                    cout<<"La operacion es correcta"<<endl;
+                    //la operacion es correcta
                 }
                 else
                 {
-                    cout<<"La operacion es incorrecta"<<endl;
+
                     if(mensaje[posicionOperacion - 1] == 'a')
                     {
                         EnviarMensaje("No se pudo realizar la operacion, la operacion esta mal formada: " + string(1,mensaje[posicionOperacion]) + string(1,mensaje[posicionOperacion + 1]));
@@ -269,6 +280,43 @@ public:
                 }
         }
 
+        //Validaciones de tipo division
+        if(operacion == '/'){
+            if(!esNumero(mensaje[posicionOperacion - 1]) || !esNumero(mensaje[posicionOperacion + 1])){
+                if(mensaje[posicionOperacion - 1] == 'a')
+                {
+                    EnviarMensaje("No se pudo realizar la operacion, la operacion esta mal formada: " + string(1,mensaje[posicionOperacion]) + string(1,mensaje[posicionOperacion + 1]));
+
+                }
+                else
+                {
+                    EnviarMensaje("No se pudo realizar la operacion, la operacion esta mal formada: " + string(1,mensaje[posicionOperacion -1]) + string(1,mensaje[posicionOperacion]) + string(1,mensaje[posicionOperacion + 1]));
+                }
+                return false;
+            }
+            if(num2 == 0)
+            {
+                EnviarMensaje("No se puedo realizar la operacion, no se puede dividir por 0");
+                return false;
+
+            }
+        }
+
+        //Validaciones de tipo potencia
+        if(operacion == '^'){
+            if(!esNumero(mensaje[posicionOperacion -1])  || !esNumero(mensaje[posicionOperacion + 1 ])){
+                if(mensaje[posicionOperacion -1] == 'a')
+                {
+                     EnviarMensaje("No se pudo realizar la operacion, la operacion esta mal formada: " + string(1,mensaje[posicionOperacion]) + string(1,mensaje[posicionOperacion + 1]));
+                }
+                else
+                {
+                    EnviarMensaje("No se pudo realizar la operacion, la operacion esta mal formada: " + string(1,mensaje[posicionOperacion -1]) + string(1,mensaje[posicionOperacion]) + string(1,mensaje[posicionOperacion + 1]));
+                }
+                return false;
+            }
+        }
+
 
 
 
@@ -279,23 +327,16 @@ public:
 
 
     void RealizarCalculo(string calculo){
-        char operacion,a,b,c,caracterInvalido = true,operacionInvalida = true;
-        string mensajeAux = "";
-        bool caracterEncontrado = false;
-        int i,num1,num2,posOperacion,totCaracteres=0, tipoError = 0;
+        char operacion,caracterInvalido = true,operacionInvalida = true;
+        string respuesta = "";
+        int i,num1,num2,totCaracteres=0;
 
-        //tipoError = tipoErrorCalculo(calculo);
-        //cout<<"tipo error "<<tipoError<<endl;
-        //Se encontro un caracter invalido
-        //Validar Caracteres Invalidos
         if(!ValidarCaracteresCalculo(calculo))
         {
-            cout<<"Se encontraron caracteres invalidos"<<endl;
             caracterInvalido = false;
         }
         if(!ValidarOperacionCalculo(calculo))
         {
-           cout<<"La operacion esta mal formada"<<endl;
            operacionInvalida = false;
         }
 
@@ -303,46 +344,45 @@ public:
         //No se encontraron errores en la operacion
         if(caracterInvalido == true && operacionInvalida == true)
         {
-            cout<<"No se encontraron errores"<<endl;
             for(i=1;calculo[i]!='\0';i++){
             if(calculo[i] == '+' || calculo[i] == '-' || calculo[i] == '/' || calculo[i] == '*' || calculo[i] == '!' || calculo[i] == '^'){
                operacion = calculo[i];
-               posOperacion = i;
             }
         }
+
         totCaracteres = i - 1 ;
-        cout<<"Total Caracteres " + to_string(totCaracteres)<<endl;
+
         //Primera Operador
         num1 = convertirAEntero(calculo.substr(1,calculo.find(operacion)-1));
+
         //Segundo Operador
         num2 = convertirAEntero(calculo.substr(calculo.find(operacion) + 1,totCaracteres - 1));
-        cout<<"numero 1 " + to_string(num1)<<endl;
-        cout<<"numero 2 " + to_string(num2)<<endl;
+
         switch(operacion){
-            case '+': mensajeAux = to_string(num1+num2);
+            case '+': respuesta = to_string(num1+num2);
 
             break;
-            case '-': mensajeAux = to_string(num1-num2);
+            case '-': respuesta = to_string(num1-num2);
 
             break;
-            case '*': mensajeAux = to_string(num1*num2);
+            case '*': respuesta = to_string(num1*num2);
 
             break;
-            case '/': mensajeAux = to_string(num1/num2);
+            case '/': respuesta = to_string(num1/num2);
 
             break;
-            case '!': mensajeAux = to_string(factorial(num1));
+            case '!': respuesta = to_string(factorial(num1));
 
             break;
-            case '^': mensajeAux = to_string((int)pow(num1,num2));
+            case '^': respuesta = to_string((int)pow(num1,num2));
             break;
 
-            default:  mensajeAux = to_string(num1);
+            default:  respuesta = to_string(num1);
         }
 
 
 
-         EnviarMensaje(mensajeAux);
+         EnviarMensaje(respuesta);
         }
 
 
@@ -373,7 +413,7 @@ public:
         file.open("server.log", ios::app | ios::out);
         if(file.fail()){
             cout<<"Error al acceder al archivo server.log";
-            exit(1);
+
         }else{
             file <<fechaHoraActual()<<":"<< mensaje.c_str() << endl;
         }
