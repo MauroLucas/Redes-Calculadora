@@ -30,12 +30,14 @@ public:
 
     void IniciarServidor()
     {
-        //Blucle Infinito del servidor
-        while(true){
         cout<<"Iniciar Servidor"<<endl;
         ArchivoLog("================================");
         ArchivoLog("==========Inicia Servidor=======");
         ArchivoLog("================================");
+
+        //Blucle Infinito del servidor
+        while(true){
+
         WSAStartup(MAKEWORD(2,0), &WSAData);
         server = socket(AF_INET, SOCK_STREAM, 0);
 
@@ -393,14 +395,16 @@ public:
     {
         closesocket(client);
         clienteConectado = false;
-        cout<<"Socket cerrado por inactividad del cliente"<<endl;
+        ArchivoLog("Conexion Cerrada por Inactividad");
+        cout<<"Conexion Cerrada por Inactividad"<<endl;
     }
 
     void CerrarSocket()
     {
         closesocket(client);
         clienteConectado = false;
-        cout << "Socket cerrado, cliente desconectado." << endl;
+        ArchivoLog("Conexion Cerrada");
+        cout << "Conexion Cerrada" << endl;
     }
 
     string fechaHoraActual(){

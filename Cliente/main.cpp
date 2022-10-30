@@ -27,7 +27,7 @@ public:
         memset(buffer, 0, sizeof(buffer));
         servidorConectado = false;
         timeOut = false;
-        tiempoMaximo = 10;
+        tiempoMaximo = 120;
 
     }
     void IniciarCliente()
